@@ -1,10 +1,12 @@
-package view;
+package com.petshop.view;
 
-import controller.ClienteController;
-import controller.PetController;
-import dao.ClienteDAO;
-import dao.PetDAO;
-import model.Cliente;
+import com.petshop.controller.ClientController;
+import com.petshop.controller.PetController;
+import com.petshop.dao.ClientDAO;
+import com.petshop.dao.PetDAO;
+import com.petshop.model.Client;
+import com.petshop.model.Pet;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,14 +17,14 @@ import java.util.List;
 public class PetShopApp extends JFrame {
     private JTextArea displayArea;
     private PetController petController;
-    private ClienteController clienteController;
+    private ClientController clientController;
 
     public PetShopApp(Connection connection) throws SQLException {
         PetDAO petDAO = new PetDAO(connection);
         petController = new PetController(petDAO);
 
-        ClienteDAO clienteDAO = new ClienteDAO(connection);
-        clienteController = new ClienteController(clienteDAO);
+        ClientDAO clientDAO = new ClientDAO(connection);
+        clientController = new ClientController(clientDAO);
 
         setTitle("Pet Shop");
         setSize(600, 500);
@@ -35,227 +37,220 @@ public class PetShopApp extends JFrame {
         add(new JScrollPane(displayArea), BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(2, 4));
+        buttonPanel.setLayout(new GridLayout(3, 3));
 
-        JButton addClienteButton = new JButton("Adicionar Cliente");
-        addClienteButton.addActionListener(e -> adicionarCliente());
-        buttonPanel.add(addClienteButton);
+        JButton addClientButton = new JButton("Add Client");
+        addClientButton.addActionListener(e -> addClient());
+        buttonPanel.add(addClientButton);
 
-        JButton addPetButton = new JButton("Adicionar Pet");
-        addPetButton.addActionListener(e -> adicionarPet());
+        JButton addPetButton = new JButton("Add Pet");
+        addPetButton.addActionListener(e -> addPet());
         buttonPanel.add(addPetButton);
 
-        JButton listClientesButton = new JButton("Listar Clientes");
-        listClientesButton.addActionListener(e -> listarClientes());
-        buttonPanel.add(listClientesButton);
+        JButton listClientsButton = new JButton("List Clients");
+        listClientsButton.addActionListener(e -> listClients());
+        buttonPanel.add(listClientsButton);
 
-        JButton listPetButton = new JButton("Listar Pets");
-        listPetButton.addActionListener(e -> listarPets());
-        buttonPanel.add(listPetButton);
+        JButton listPetsButton = new JButton("List Pets");
+        listPetsButton.addActionListener(e -> listPets());
+        buttonPanel.add(listPetsButton);
 
-        JButton removeClienteButton = new JButton("Remover Cliente");
-        removeClienteButton.addActionListener(e -> removerCliente());
-        buttonPanel.add(removeClienteButton);
+        JButton removeClientButton = new JButton("Remove Client");
+        removeClientButton.addActionListener(e -> removeClient());
+        buttonPanel.add(removeClientButton);
 
-        JButton removePetButton = new JButton("Remover Pet");
-        removePetButton.addActionListener(e -> removerPet());
+        JButton removePetButton = new JButton("Remove Pet");
+        removePetButton.addActionListener(e -> removePet());
         buttonPanel.add(removePetButton);
 
-        JButton searchCpfButton = new JButton("Pesquisar por CPF");
-        searchCpfButton.addActionListener(e -> pesquisarPorCpf());
+        JButton searchCpfButton = new JButton("Search by CPF");
+        searchCpfButton.addActionListener(e -> searchByCpf());
         buttonPanel.add(searchCpfButton);
-        
-        JButton searchNomeButton = new JButton("Pesquisar por Nome");
-        searchNomeButton.addActionListener(e -> pesquisarPorNome());
-        buttonPanel.add(searchNomeButton);
 
-        JButton clearButton = new JButton("Limpar Display");
-        clearButton.addActionListener(e -> clearDisplay());
-        buttonPanel.add(clearButton);
+        JButton searchNameButton = new JButton("Search by Name");
+        searchNameButton.addActionListener(e -> searchByName());
+        buttonPanel.add(searchNameButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
-    
-    private boolean isNomeValido(String nome) {
-        return nome != null && nome.matches("[a-zA-Z\\s]+");
+
+    private boolean isNameValid(String name) {
+        return name != null && name.matches("[a-zA-Z\\s]+");
     }
 
-    private boolean isCpfValido(String cpf) {
+    private boolean isCpfValid(String cpf) {
         return cpf != null && cpf.matches("\\d{11}");
     }
 
-    private boolean isIdadeValida(String idade) {
-        return idade != null && idade.matches("\\d+");
+    private boolean isAgeValid(String ageStr) {
+        return ageStr != null && ageStr.matches("\\d+");
     }
 
-    private void adicionarCliente() {
-        String nome = JOptionPane.showInputDialog(this, "Digite o nome do cliente:");
-        if (!isNomeValido(nome)) {
-            displayArea.setText("Erro: Nome inválido ou vazio. Use apenas letras.");
+    private void addClient() {
+        String name = JOptionPane.showInputDialog(this, "Enter client name:");
+        if (!isNameValid(name)) {
+            displayArea.setText("Error: Invalid name. Use letters only.");
             return;
         }
 
-        String cpf = JOptionPane.showInputDialog(this, "Digite o CPF do cliente (somente números):");
-        if (!isCpfValido(cpf)) {
-            displayArea.setText("Erro: CPF inválido ou vazio. Deve conter 11 dígitos.");
+        String cpf = JOptionPane.showInputDialog(this, "Enter client CPF (numbers only):");
+        if (!isCpfValid(cpf)) {
+            displayArea.setText("Error: Invalid CPF. Must be 11 digits.");
             return;
         }
 
-        String telefone = JOptionPane.showInputDialog(this, "Digite o telefone do cliente:");
+        String phone = JOptionPane.showInputDialog(this, "Enter client phone number:");
         try {
-            clienteController.adicionarCliente(nome, cpf, telefone);
-            displayArea.setText("Cliente adicionado com sucesso.");
-        } catch (SQLException ex) {
-            displayArea.setText("Erro ao adicionar cliente.");
-            ex.printStackTrace();
-        }
-    }
-
-    private void adicionarPet() {
-        String nome = JOptionPane.showInputDialog(this, "Digite o nome do pet:");
-        if (!isNomeValido(nome)) {
-            displayArea.setText("Erro: Nome do pet inválido. Use apenas letras.");
-            return;
-        }
-
-        String idadeStr = JOptionPane.showInputDialog(this, "Digite a idade do pet:");
-        if (!isIdadeValida(idadeStr)) {
-            displayArea.setText("Erro: Idade inválida. Deve conter apenas números.");
-            return;
-        }
-        int idade = Integer.parseInt(idadeStr);
-
-        String tipo = JOptionPane.showInputDialog(this, "Digite o tipo do pet (ex: Cachorro):");
-        if (!isNomeValido(tipo)) {
-            displayArea.setText("Erro: Tipo inválido. Use apenas letras.");
-            return;
-        }
-
-        String raca = JOptionPane.showInputDialog(this, "Digite a raça do pet:");
-        if (!isNomeValido(raca)) {
-            displayArea.setText("Erro: Raça inválida. Use apenas letras.");
-            return;
-        }
-
-        String idClienteStr = JOptionPane.showInputDialog(this, "Digite o ID do dono:");
-        if (!isIdadeValida(idClienteStr)) {
-            displayArea.setText("Erro: ID do dono inválido. Deve conter apenas números.");
-            return;
-        }
-        int idCliente = Integer.parseInt(idClienteStr);
-
-        try {
-            petController.adicionarPet(nome, idade, tipo, raca, idCliente);
-            displayArea.setText("Pet adicionado com sucesso.");
-        } catch (SQLException ex) {
-            displayArea.setText("Erro ao adicionar pet.");
-            ex.printStackTrace();
+            clientController.addClient(name, cpf, phone);
+            displayArea.setText("Client added successfully.");
+        } catch (SQLException e) {
+            displayArea.setText("Error adding client.");
+            e.printStackTrace();
         }
     }
 
-    
-    private void listarClientes() {
+    private void addPet() {
+        String name = JOptionPane.showInputDialog(this, "Enter pet name:");
+        if (!isNameValid(name)) {
+            displayArea.setText("Error: Invalid pet name.");
+            return;
+        }
+
+        String ageStr = JOptionPane.showInputDialog(this, "Enter pet age:");
+        if (!isAgeValid(ageStr)) {
+            displayArea.setText("Error: Invalid age.");
+            return;
+        }
+        int age = Integer.parseInt(ageStr);
+
+        String type = JOptionPane.showInputDialog(this, "Enter pet type (e.g., Dog):");
+        if (!isNameValid(type)) {
+            displayArea.setText("Error: Invalid type.");
+            return;
+        }
+
+        String breed = JOptionPane.showInputDialog(this, "Enter pet breed:");
+        if (!isNameValid(breed)) {
+            displayArea.setText("Error: Invalid breed.");
+            return;
+        }
+
+        String clientIdStr = JOptionPane.showInputDialog(this, "Enter owner ID:");
+        if (!isAgeValid(clientIdStr)) {
+            displayArea.setText("Error: Invalid owner ID.");
+            return;
+        }
+        int clientId = Integer.parseInt(clientIdStr);
+
         try {
-            clearDisplay();
-            var clientes = clienteController.listarClientes();
-            for (var cliente : clientes) {
-                displayArea.append("ID: " + cliente.getId() + " | Nome: " + cliente.getNome() + 
-                                   " | CPF: " + cliente.getCpf() + " | Telefone: " + cliente.getTelefone() + "\n");
+            petController.addPet(name, age, type, breed, clientId);
+            displayArea.setText("Pet added successfully.");
+        } catch (SQLException e) {
+            displayArea.setText("Error adding pet.");
+            e.printStackTrace();
+        }
+    }
+
+    private void listClients() {
+        try {
+            displayArea.setText("");
+            List<Client> clients = clientController.listClients();
+            for (Client client : clients) {
+                displayArea.append("ID: " + client.getId() + " | Name: " + client.getName() +
+                        " | CPF: " + client.getCpf() + " | Phone: " + client.getPhone() + "\n");
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao listar clientes!", "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error listing clients!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void listarPets() {
+    private void listPets() {
         try {
-            clearDisplay();
-            var pets = petController.listarPets();
-            for (var pet : pets) {
-                displayArea.append("ID: " + pet.getId() + " | Nome: " + pet.getNome() + " | Idade: " + pet.getIdade() +
-                                   " | Tipo: " + pet.getTipo() + " | Raça: " + pet.getRaca() + "\n");
+            displayArea.setText("");
+            List<Pet> pets = petController.listPets();
+            for (Pet pet : pets) {
+                displayArea.append("ID: " + pet.getId() + " | Name: " + pet.getName() +
+                        " | Age: " + pet.getAge() + " | Type: " + pet.getType() +
+                        " | Breed: " + pet.getBreed() + "\n");
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao listar pets!", "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error listing pets!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void removerCliente() {
-        String idClienteStr = JOptionPane.showInputDialog(this, "Digite o ID do cliente para remover:");
-        if (idClienteStr != null && !idClienteStr.trim().isEmpty()) {
+    private void removeClient() {
+        String clientIdStr = JOptionPane.showInputDialog(this, "Enter client ID to remove:");
+        if (clientIdStr != null && !clientIdStr.trim().isEmpty()) {
             try {
-                int idCliente = Integer.parseInt(idClienteStr);
-                String resultado = clienteController.removerCliente(idCliente);
-                displayArea.setText(resultado);
-            } catch (NumberFormatException ex) {
-                displayArea.setText("Erro: ID inválido. Deve ser um número.");
-            } catch (SQLException ex) {
-                displayArea.setText("Erro ao remover cliente.");
-                ex.printStackTrace();
+                int clientId = Integer.parseInt(clientIdStr);
+                String result = clientController.removeClient(clientId);
+                displayArea.setText(result);
+            } catch (NumberFormatException e) {
+                displayArea.setText("Error: Invalid ID. Must be a number.");
+            } catch (SQLException e) {
+                displayArea.setText("Error removing client.");
+                e.printStackTrace();
             }
         } else {
-            displayArea.setText("ID do cliente não fornecido.");
+            displayArea.setText("Client ID not provided.");
         }
     }
 
-
-    private void removerPet() {
-        String idPetStr = JOptionPane.showInputDialog(this, "Digite o ID do pet para remover:");
-        if (idPetStr != null && !idPetStr.trim().isEmpty()) {
+    private void removePet() {
+        String petIdStr = JOptionPane.showInputDialog(this, "Enter pet ID to remove:");
+        if (petIdStr != null && !petIdStr.trim().isEmpty()) {
             try {
-                int idPet = Integer.parseInt(idPetStr);
-                String resultado = petController.removerPet(idPet);
-                displayArea.setText(resultado);
-            } catch (NumberFormatException ex) {
-                displayArea.setText("Erro: ID inválido. Deve ser um número.");
-            } catch (SQLException ex) {
-                displayArea.setText("Erro ao remover pet.");
-                ex.printStackTrace();
+                int petId = Integer.parseInt(petIdStr);
+                String result = petController.removePet(petId);
+                displayArea.setText(result);
+            } catch (NumberFormatException e) {
+                displayArea.setText("Error: Invalid ID. Must be a number.");
+            } catch (SQLException e) {
+                displayArea.setText("Error removing pet.");
+                e.printStackTrace();
             }
         } else {
-            displayArea.setText("ID do pet não fornecido.");
+            displayArea.setText("Pet ID not provided.");
         }
     }
 
-
-    private void pesquisarPorCpf() {
+    private void searchByCpf() {
         try {
-            String cpf = JOptionPane.showInputDialog(this, "Digite o CPF do cliente:");
-            var cliente = clienteController.pesquisarPorCpf(cpf);
-            if (cliente != null) {
-                displayArea.append("Cliente encontrado: ID: " + cliente.getId() + " | Nome: " + cliente.getNome() +
-                                   " | CPF: " + cliente.getCpf() + " | Telefone: " + cliente.getTelefone() + "\n");
+            String cpf = JOptionPane.showInputDialog(this, "Enter client CPF:");
+            Client client = clientController.searchByCpf(cpf);
+            if (client != null) {
+                displayArea.append("Client found: ID: " + client.getId() + " | Name: " + client.getName() +
+                        " | CPF: " + client.getCpf() + " | Phone: " + client.getPhone() + "\n");
             } else {
-                displayArea.append("Cliente com CPF " + cpf + " não encontrado.\n");
+                displayArea.append("Client with CPF " + cpf + " not found.\n");
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao pesquisar cliente!", "Erro", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error searching client!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    private void pesquisarPorNome() {
-        String nome = JOptionPane.showInputDialog(this, "Digite o nome do cliente:");
-        if (nome != null && !nome.trim().isEmpty()) {
+
+    private void searchByName() {
+        String name = JOptionPane.showInputDialog(this, "Enter client name to search:");
+        if (name != null && !name.trim().isEmpty()) {
             try {
-                List<Cliente> clientes = clienteController.pesquisarPorNome(nome);
+                List<Client> clients = clientController.searchByName(name);
                 displayArea.setText("");
-                if (clientes.isEmpty()) {
-                    displayArea.append("Nenhum cliente encontrado com o nome: " + nome);
+                if (clients.isEmpty()) {
+                    displayArea.append("No clients found with name: " + name);
                 } else {
-                    for (Cliente cliente : clientes) {
-                        displayArea.append("ID: " + cliente.getId() + ", Nome: " + cliente.getNome() +
-                                           ", CPF: " + cliente.getCpf() + ", Telefone: " + cliente.getTelefone() + "\n");
+                    for (Client client : clients) {
+                        displayArea.append("ID: " + client.getId() + ", Name: " + client.getName() +
+                                ", CPF: " + client.getCpf() + ", Phone: " + client.getPhone() + "\n");
                     }
                 }
-            } catch (SQLException ex) {
-                displayArea.setText("Erro ao pesquisar clientes por nome.");
-                ex.printStackTrace();
+            } catch (SQLException e) {
+                displayArea.setText("Error searching clients by name.");
+                e.printStackTrace();
             }
         } else {
-            displayArea.setText("Nome não fornecido para pesquisa.");
+            displayArea.setText("Name not provided for search.");
         }
     }
-
 
     private void clearDisplay() {
         displayArea.setText("");

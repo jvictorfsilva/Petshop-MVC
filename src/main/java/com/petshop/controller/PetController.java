@@ -1,7 +1,7 @@
-package controller;
+package com.petshop.controller;
 
-import model.Pet;
-import dao.PetDAO;
+import com.petshop.model.Pet;
+import com.petshop.dao.PetDAO;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -13,26 +13,25 @@ public class PetController {
         this.petDAO = petDAO;
     }
 
-    public List<Pet> listarPets() throws SQLException {
-        return petDAO.listarPets();
+    public List<Pet> listPets() throws SQLException {
+        return petDAO.listPets();
     }
 
-    public void adicionarPet(String nome, int idade, String tipo, String raca, int idCliente) throws SQLException {
-        Pet pet = new Pet(0, nome, idade, tipo, raca, idCliente);
-        petDAO.adicionarPet(pet);
+    public void addPet(String name, int age, String type, String breed, int clientId) throws SQLException {
+        Pet pet = new Pet(0, name, age, type, breed, clientId);
+        petDAO.addPet(pet);
     }
 
-    public boolean existePet(int idPet) throws SQLException {
-        return petDAO.buscarPetPorId(idPet) != null;
+    public boolean petExists(int petId) throws SQLException {
+        return petDAO.findPetById(petId) != null;
     }
 
-    public String removerPet(int idPet) throws SQLException {
-        if (existePet(idPet)) {
-            petDAO.removerPet(idPet);
-            return "Pet removido com sucesso.";
+    public String removePet(int petId) throws SQLException {
+        if (petExists(petId)) {
+            petDAO.removePet(petId);
+            return "Pet removed successfully.";
         } else {
-            return "Erro: Pet com ID " + idPet + " não encontrado.";
+            return "Error: Pet with ID " + petId + " not found.";
         }
     }
-
 }

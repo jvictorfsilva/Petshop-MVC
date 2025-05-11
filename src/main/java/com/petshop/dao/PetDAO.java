@@ -1,6 +1,6 @@
-package dao;
+package com.petshop.dao;
 
-import model.Pet;
+import com.petshop.model.Pet;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,19 +13,19 @@ public class PetDAO {
         this.connection = connection;
     }
 
-    public List<Pet> listarPets() throws SQLException {
+    public List<Pet> listPets() throws SQLException {
         List<Pet> pets = new ArrayList<>();
         String sql = "SELECT * FROM pets";
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 Pet pet = new Pet(
-                    resultSet.getInt("id"),
-                    resultSet.getString("nome"),
-                    resultSet.getInt("idade"),
-                    resultSet.getString("tipo"),
-                    resultSet.getString("raca"),
-                    resultSet.getInt("id_cliente")
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getInt("age"),
+                        resultSet.getString("type"),
+                        resultSet.getString("breed"),
+                        resultSet.getInt("client_id")
                 );
                 pets.add(pet);
             }
@@ -33,43 +33,43 @@ public class PetDAO {
         return pets;
     }
 
-    public void adicionarPet(Pet pet) throws SQLException {
-        String sql = "INSERT INTO pets (nome, idade, tipo, raca, id_cliente) VALUES (?, ?, ?, ?, ?)";
+    public void addPet(Pet pet) throws SQLException {
+        String sql = "INSERT INTO pets (name, age, type, breed, client_id) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, pet.getNome());
-            statement.setInt(2, pet.getIdade());
-            statement.setString(3, pet.getTipo());
-            statement.setString(4, pet.getRaca());
-            statement.setInt(5, pet.getIdCliente());
+            statement.setString(1, pet.getName());
+            statement.setInt(2, pet.getAge());
+            statement.setString(3, pet.getType());
+            statement.setString(4, pet.getBreed());
+            statement.setInt(5, pet.getClientId());
             statement.executeUpdate();
         }
     }
 
-    public void removerPet(int idPet) throws SQLException {
+    public void removePet(int petId) throws SQLException {
         String sql = "DELETE FROM pets WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, idPet);
+            statement.setInt(1, petId);
             statement.executeUpdate();
         }
     }
-    public Pet buscarPetPorId(int idPet) throws SQLException {
+
+    public Pet findPetById(int petId) throws SQLException {
         String sql = "SELECT * FROM pets WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, idPet);
+            statement.setInt(1, petId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return new Pet(
-                        resultSet.getInt("id"),
-                        resultSet.getString("nome"),
-                        resultSet.getInt("idade"),
-                        resultSet.getString("tipo"),
-                        resultSet.getString("raca"),
-                        resultSet.getInt("id_cliente")
+                            resultSet.getInt("id"),
+                            resultSet.getString("name"),
+                            resultSet.getInt("age"),
+                            resultSet.getString("type"),
+                            resultSet.getString("breed"),
+                            resultSet.getInt("client_id")
                     );
                 }
             }
         }
         return null;
     }
-
 }

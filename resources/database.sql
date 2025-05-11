@@ -1,24 +1,24 @@
 CREATE DATABASE IF NOT EXISTS petshop_db;
 USE petshop_db;
 
-CREATE TABLE IF NOT EXISTS clientes (
+CREATE TABLE IF NOT EXISTS clients (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    telefone VARCHAR(20) NOT NULL,
-    cpf VARCHAR(11) UNIQUE NOT NULL
+    name VARCHAR(100) NOT NULL,
+    cpf CHAR(11) NOT NULL UNIQUE,
+    phone VARCHAR(20)
 );
 
 CREATE TABLE IF NOT EXISTS pets (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    idade INT NOT NULL,
-    tipo VARCHAR(50) NOT NULL,
-    raca VARCHAR(50) NOT NULL,
-    id_cliente INT,
-    FOREIGN KEY (id_cliente) REFERENCES clientes(id) ON DELETE CASCADE
+    name VARCHAR(100) NOT NULL,
+    age INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    breed VARCHAR(50) NOT NULL,
+    client_id INT NOT NULL,
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
 );
 
-INSERT INTO clientes (nome, telefone, cpf) VALUES 
+INSERT INTO clients (name, phone, cpf) VALUES
 ('Alice Silva', '11987654321', '12345678901'),
 ('Bruno Costa', '11976543210', '12345678902'),
 ('Carla Mendes', '11987654322', '12345678903'),
@@ -30,14 +30,14 @@ INSERT INTO clientes (nome, telefone, cpf) VALUES
 ('Igor Martins', '11987654325', '12345678909'),
 ('Juliana Ferreira', '11976543214', '12345678910');
 
-INSERT INTO pets (nome, idade, tipo, raca, id_cliente) VALUES 
-('Rex', 3, 'Cachorro', 'Labrador', 1),
-('Miau', 2, 'Gato', 'Siamês', 1),
-('Fido', 4, 'Cachorro', 'Bulldog', 2),
-('Luna', 1, 'Gato', 'Persa', 3),
-('Bob', 5, 'Cachorro', 'Poodle', 4),
-('Kitty', 2, 'Gato', 'Sphynx', 5),
-('Thor', 6, 'Cachorro', 'Golden Retriever', 6),
-('Nina', 4, 'Gato', 'Maine Coon', 7),
-('Max', 1, 'Cachorro', 'Beagle', 8),
-('Bella', 3, 'Gato', 'Ragdoll', 9);
+INSERT INTO pets (name, age, type, breed, client_id) VALUES 
+('Rex', 3, 'Dog', 'Labrador', 1),
+('Miau', 2, 'Cat', 'Siamês', 1),
+('Fido', 4, 'Dog', 'Bulldog', 2),
+('Luna', 1, 'Cat', 'Persa', 3),
+('Bob', 5, 'Dog', 'Poodle', 4),
+('Kitty', 2, 'Cat', 'Sphynx', 5),
+('Thor', 6, 'Dog', 'Golden Retriever', 6),
+('Nina', 4, 'Cat', 'Maine Coon', 7),
+('Max', 1, 'Dog', 'Beagle', 8),
+('Bella', 3, 'Cat', 'Ragdoll', 9);

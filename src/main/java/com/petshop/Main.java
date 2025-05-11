@@ -1,4 +1,4 @@
-import view.PetShopApp;
+import com.petshop.view.PetShopApp;
 
 import javax.swing.*;
 import java.sql.Connection;
@@ -19,13 +19,13 @@ public class Main {
                     PetShopApp app = new PetShopApp(connection);
                     app.setVisible(true);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "Erro ao inicializar a aplicação!", "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Error initializing application!", "Error", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 }
             });
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Erro de conexão com o banco de dados!", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Database connection error!", "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
